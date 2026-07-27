@@ -2,5 +2,4 @@ build
 仕様書.md
 venv
 .opencode
-*.spec
 __pycache__
