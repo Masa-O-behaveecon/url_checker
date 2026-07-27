@@ -113,6 +113,7 @@ class URLCheckView(ctk.CTkFrame):
         self.warn_textbox.configure(state="disabled")
 
         self.configured_params = {}
+        self.editing_param_name = None
         self.refresh_config()
 
     def refresh_config(self):
@@ -172,6 +173,40 @@ class URLCheckView(ctk.CTkFrame):
             val_container = ctk.CTkFrame(row, fg_color="transparent")
             val_container.pack(side="left", fill="x", expand=True, padx=5)
 
+            is_editing_name = (name == self.editing_param_name)
+
+            if is_editing_name:
+                name_var = ctk.StringVar(value=name)
+                name_entry = ctk.CTkEntry(var_col, textvariable=name_var, width=115, height=28)
+                name_entry.pack(side="left", padx=5, pady=7)
+                name_entry.focus_set()
+
+                def save_name(old_n=name, n_var=name_var):
+                    new_n = n_var.get().strip()
+                    if new_n and new_n != old_n:
+                        current_url = self.url_entry.get()
+                        updated_url = URLChecker.update_query_param_name(current_url, old_n, new_n)
+                        self.url_entry.delete(0, "end")
+                        self.url_entry.insert(0, updated_url)
+                    self.editing_param_name = None
+                    self.run_check()
+
+                def cancel_name():
+                    self.editing_param_name = None
+                    self.run_check()
+
+                name_entry.bind("<Return>", lambda e: save_name())
+
+                IconButton(var_col, text=ICON_CANCEL, command=cancel_name).pack(side="right", padx=2)
+                IconButton(var_col, text=ICON_SAVE, command=save_name).pack(side="right", padx=2)
+
+            else:
+                var_color = ("green", "lightgreen") if valid_var else ("red", "salmon")
+                ctk.CTkLabel(var_col, text=name, anchor="w", justify="left", wraplength=120, text_color=var_color, font=ctk.CTkFont(weight="bold")).pack(side="left", padx=5, fill="y")
+                
+                IconButton(var_col, text=ICON_DELETE, command=lambda pn=name: self.url_entry.delete(0, "end") or self.url_entry.insert(0, URLChecker.remove_query_param(self.url_entry.get(), pn)) or self.run_check()).pack(side="right", padx=2)
+                IconButton(var_col, text=ICON_EDIT, command=lambda pn=name: (setattr(self, 'editing_param_name', pn), self.run_check())).pack(side="right", padx=2)
+
             choices = list(self.configured_params.get(name, []))
             if val not in choices:
                 choices.append(val)
@@ -201,12 +236,6 @@ class URLCheckView(ctk.CTkFrame):
                 combo._entry.bind("<Return>", handler)
                 combo._entry.bind("<FocusOut>", handler)
             combo.bind("<<ComboboxSelected>>", handler)
-
-            var_color = ("green", "lightgreen") if valid_var else ("red", "salmon")
-            ctk.CTkLabel(var_col, text=name, anchor="w", justify="left", wraplength=120, text_color=var_color, font=ctk.CTkFont(weight="bold")).pack(side="left", padx=5, fill="y")
-            
-            IconButton(var_col, text=ICON_DELETE, command=lambda pn=name: self.url_entry.delete(0, "end") or self.url_entry.insert(0, URLChecker.remove_query_param(self.url_entry.get(), pn)) or self.run_check()).pack(side="right", padx=2)
-            IconButton(var_col, text=ICON_EDIT, command=lambda pn=name: (self.app.show_settings_view(), self.app.settings_frame.start_edit(pn, self.configured_params.get(pn, [])))).pack(side="right", padx=2)
 
 
 class SettingsView(ctk.CTkFrame):
