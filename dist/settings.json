@@ -1,0 +1,18 @@
+{
+    "parameters": {
+        "campaign": [
+            "summer",
+            "winter",
+            "spring",
+            "autumn",
+            "normal"
+        ],
+        "media": [
+            "YouTubel",
+            "Facebook",
+            "Note",
+            "Instagram",
+            "X"
+        ]
+    }
+}

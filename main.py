@@ -157,7 +157,7 @@ class URLCheckView(ctk.CTkFrame):
 
         header_row = ctk.CTkFrame(self.param_table_frame, fg_color=("gray85", "gray25"))
         header_row.pack(fill="x", pady=2)
-        ctk.CTkLabel(header_row, text="パラメータ名 (編集 / 削除)", font=ctk.CTkFont(weight="bold"), width=230).pack(side="left", padx=5, pady=5)
+        ctk.CTkLabel(header_row, text="パラメータ名", font=ctk.CTkFont(weight="bold"), width=230).pack(side="left", padx=5, pady=5)
         ctk.CTkLabel(header_row, text="値 (選択)", font=ctk.CTkFont(weight="bold")).pack(side="left", padx=5, pady=5, expand=True, fill="x")
 
         for param in parsed_params:
