@@ -12,7 +12,7 @@ class TestURLChecker(unittest.TestCase):
         }
 
     def test_valid_url(self):
-        url = "https://example.com/posts/2026-07-26?media=X&campaign=summer"
+        url = "https://example.com/posts/2026-07-26.html?media=X&campaign=summer"
         res = URLChecker.validate_url(url, self.config)
         self.assertTrue(res["is_valid"])
         self.assertTrue(res["date_valid"])
@@ -39,19 +39,19 @@ class TestURLChecker(unittest.TestCase):
         self.assertTrue(any("未登録" in w for w in res["warnings"]))
 
     def test_update_query_param(self):
-        url = "https://example.com/posts/2026-07-26?media=X&campaign=summer"
+        url = "https://example.com/posts/2026-07-26.html?media=X&campaign=summer"
         updated = URLChecker.update_query_param(url, "media", "YouTube")
         self.assertIn("media=YouTube", updated)
         self.assertIn("campaign=summer", updated)
 
     def test_update_query_param_name(self):
-        url = "https://example.com/posts/2026-07-26?med=X&campaign=summer"
+        url = "https://example.com/posts/2026-07-26.html?med=X&campaign=summer"
         updated = URLChecker.update_query_param_name(url, "med", "media")
         self.assertIn("media=X", updated)
         self.assertNotIn("med=X", updated)
 
     def test_remove_query_param(self):
-        url = "https://example.com/posts/2026-07-26?media=X&campaign=summer"
+        url = "https://example.com/posts/2026-07-26.html?media=X&campaign=summer"
         updated = URLChecker.remove_query_param(url, "campaign")
         self.assertIn("media=X", updated)
         self.assertNotIn("campaign=summer", updated)

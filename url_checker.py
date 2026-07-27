@@ -2,7 +2,7 @@ import re
 from urllib.parse import urlparse, parse_qsl, urlencode, urlunparse
 from util import safe_execute
 
-DATE_REGEX = re.compile(r'^\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01])$')
+DATE_HTML_REGEX = re.compile(r'^(\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\d|3[01]))\.html$')
 
 class URLChecker:
     @staticmethod
@@ -42,11 +42,12 @@ class URLChecker:
         else:
             segments = path.split('/')
             last_segment = segments[-1] if segments else ""
-            date_str = last_segment
-            if DATE_REGEX.match(last_segment):
+            match = DATE_HTML_REGEX.match(last_segment)
+            if match:
                 date_valid = True
+                date_str = match.group(1)
             else:
-                warnings.append(f"警告: URLの最下層（'{last_segment}'）が日付(YYYY-MM-DD)形式ではありません。")
+                warnings.append(f"警告: URLの最下層（'{last_segment}'）が日付(YYYY-MM-DD.html)形式ではありません。")
 
         # Parse query parameters
         query_list = safe_execute(parse_qsl, parsed.query, error_title="解析エラー", error_message="クエリパラメータの解析に失敗しました。", default=[(k, v) for k, v in parse_qsl(parsed.query, keep_blank_values=True)], keep_blank_values=True)
