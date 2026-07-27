@@ -156,7 +156,7 @@ class URLCheckView(ctk.CTkFrame):
 
         header_row = ctk.CTkFrame(self.param_table_frame, fg_color=("gray85", "gray25"))
         header_row.pack(fill="x", pady=2)
-        ctk.CTkLabel(header_row, text="変数名 (編集 / 削除)", font=ctk.CTkFont(weight="bold"), width=230).pack(side="left", padx=5, pady=5)
+        ctk.CTkLabel(header_row, text="パラメータ名 (編集 / 削除)", font=ctk.CTkFont(weight="bold"), width=230).pack(side="left", padx=5, pady=5)
         ctk.CTkLabel(header_row, text="値 (選択)", font=ctk.CTkFont(weight="bold")).pack(side="left", padx=5, pady=5, expand=True, fill="x")
 
         for param in parsed_params:
@@ -206,6 +206,7 @@ class URLCheckView(ctk.CTkFrame):
             ctk.CTkLabel(var_col, text=name, anchor="w", justify="left", wraplength=120, text_color=var_color, font=ctk.CTkFont(weight="bold")).pack(side="left", padx=5, fill="y")
             
             IconButton(var_col, text=ICON_DELETE, command=lambda pn=name: self.url_entry.delete(0, "end") or self.url_entry.insert(0, URLChecker.remove_query_param(self.url_entry.get(), pn)) or self.run_check()).pack(side="right", padx=2)
+            IconButton(var_col, text=ICON_EDIT, command=lambda pn=name: (self.app.show_settings_view(), self.app.settings_frame.start_edit(pn, self.configured_params.get(pn, [])))).pack(side="right", padx=2)
 
 
 class SettingsView(ctk.CTkFrame):
@@ -221,15 +222,15 @@ class SettingsView(ctk.CTkFrame):
         ctk.CTkButton(header_frame, text="← 戻る", width=80, command=self.app.show_check_view).pack(side="left")
         ctk.CTkLabel(header_frame, text="パラメータ設定管理", font=ctk.CTkFont(size=22, weight="bold")).pack(side="left", padx=15)
 
-        ctk.CTkLabel(self, text="URLのクエリパラメータの変数名および許可される値（ComboBoxの選択肢）を管理します。", font=ctk.CTkFont(size=13)).pack(anchor="w", pady=(0, 10))
+        ctk.CTkLabel(self, text="URLのクエリパラメータおよび入力可能な値を管理します。", font=ctk.CTkFont(size=13)).pack(anchor="w", pady=(0, 10))
 
         add_var_frame = ctk.CTkFrame(self)
         add_var_frame.pack(fill="x", pady=(0, 15), padx=0)
 
-        ctk.CTkLabel(add_var_frame, text="新規変数の追加:", font=ctk.CTkFont(weight="bold")).pack(side="left", padx=10, pady=10)
-        self.new_var_entry = ctk.CTkEntry(add_var_frame, placeholder_text="変数名 (例: platform)", width=200)
+        ctk.CTkLabel(add_var_frame, text="新規パラメータの追加:", font=ctk.CTkFont(weight="bold")).pack(side="left", padx=10, pady=10)
+        self.new_var_entry = ctk.CTkEntry(add_var_frame, placeholder_text="パラメータ名 (例: platform)", width=200)
         self.new_var_entry.pack(side="left", padx=5, pady=10)
-        ctk.CTkButton(add_var_frame, text="変数を追加", command=self.add_variable).pack(side="left", padx=5, pady=10)
+        ctk.CTkButton(add_var_frame, text="パラメータを追加", command=self.add_variable).pack(side="left", padx=5, pady=10)
 
         self.vars_scroll = ctk.CTkScrollableFrame(self, height=450)
         self.vars_scroll.pack(fill="both", expand=True, pady=(0, 10))
@@ -242,7 +243,7 @@ class SettingsView(ctk.CTkFrame):
 
         params = self.app.config_manager.get_parameters()
         if not params:
-            ctk.CTkLabel(self.vars_scroll, text="登録されているパラメータ変数はありません。", text_color="gray").pack(pady=20)
+            ctk.CTkLabel(self.vars_scroll, text="登録されているパラメータはありません。", text_color="gray").pack(pady=20)
             return
 
         for var_name, values in params.items():
@@ -262,12 +263,12 @@ class SettingsView(ctk.CTkFrame):
             IconButton(top_row, text=ICON_CANCEL, command=lambda v=var_name: self.cancel_edit(v)).pack(side="right", padx=2)
             IconButton(top_row, text=ICON_SAVE, command=lambda v=var_name: self.save_variable_edit(v)).pack(side="right", padx=2)
             
-            ctk.CTkLabel(top_row, text="変数名:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=(0, 5))
+            ctk.CTkLabel(top_row, text="パラメータ名:", font=ctk.CTkFont(size=13, weight="bold")).pack(side="left", padx=(0, 5))
             ctk.CTkEntry(top_row, textvariable=state["name_var"], width=180, height=28).pack(side="left", padx=5)
         else:
             IconButton(top_row, text=ICON_DELETE, command=lambda v=var_name: self.delete_variable(v)).pack(side="right", padx=2)
             IconButton(top_row, text=ICON_EDIT, command=lambda v=var_name: self.start_edit(v, values)).pack(side="right", padx=2)
-            ctk.CTkLabel(top_row, text=f"変数名: {var_name}", font=ctk.CTkFont(size=14, weight="bold")).pack(side="left", padx=(5, 5))
+            ctk.CTkLabel(top_row, text=f"パラメータ名: {var_name}", font=ctk.CTkFont(size=14, weight="bold")).pack(side="left", padx=(5, 5))
 
         ctk.CTkLabel(var_card, text="許可される値一覧:", font=ctk.CTkFont(size=12, weight="bold")).pack(anchor="w", padx=10, pady=(8, 2))
         vals_container = ctk.CTkFrame(var_card, fg_color="transparent")
@@ -345,12 +346,12 @@ class SettingsView(ctk.CTkFrame):
         state = self.editing_states[old_name]
         new_name = state["name_var"].get().strip()
         if not new_name:
-            messagebox.showwarning("入力エラー", "変数名を入力してください。")
+            messagebox.showwarning("入力エラー", "パラメータ名を入力してください。")
             return
 
         params = copy.deepcopy(self.app.config_manager.get_parameters())
         if new_name != old_name and new_name in params:
-            messagebox.showerror("エラー", "既に存在する変数名です。")
+            messagebox.showerror("エラー", "既に存在するパラメータ名です。")
             return
 
         # Collect final values from string vars
@@ -387,23 +388,23 @@ class SettingsView(ctk.CTkFrame):
     def add_variable(self):
         var_name = self.new_var_entry.get().strip()
         if not var_name:
-            messagebox.showwarning("入力エラー", "変数名を入力してください。")
+            messagebox.showwarning("入力エラー", "パラメータ名を入力してください。")
             return
         
-        success = safe_execute(self.app.config_manager.add_variable, var_name, error_message="変数の追加に失敗しました。", default=False)
+        success = safe_execute(self.app.config_manager.add_variable, var_name, error_message="パラメータの追加に失敗しました。", default=False)
         if success:
             self.new_var_entry.delete(0, "end")
             params = self.app.config_manager.get_parameters()
             self.start_edit(var_name, params.get(var_name, []))
             self.refresh_list()
         else:
-            messagebox.showerror("エラー", "変数の追加に失敗しました（既に存在するか無効な名前です）。")
+            messagebox.showerror("エラー", "パラメータの追加に失敗しました（既に存在するか無効な名前です）。")
 
     def delete_variable(self, var_name):
-        if not messagebox.askyesno("確認", f"変数 '{var_name}' を削除してもよろしいですか？"):
+        if not messagebox.askyesno("確認", f"パラメータ '{var_name}' を削除してもよろしいですか？"):
             return
 
-        success = safe_execute(self.app.config_manager.remove_variable, var_name, error_message="変数の削除に失敗しました。", default=False)
+        success = safe_execute(self.app.config_manager.remove_variable, var_name, error_message="パラメータの削除に失敗しました。", default=False)
         if success:
             if var_name in self.editing_states:
                 del self.editing_states[var_name]
