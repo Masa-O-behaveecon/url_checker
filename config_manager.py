@@ -2,13 +2,31 @@ import os
 import sys
 from util import load_json_file, save_json_file
 
-# Determine base directory (script directory or executable directory)
-if getattr(sys, 'frozen', False):
-    BASE_DIR = os.path.dirname(os.path.abspath(sys.executable))
-else:
-    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+def get_config_path():
+    if getattr(sys, 'frozen', False):
+        exe_dir = os.path.dirname(os.path.abspath(sys.executable))
+        if sys.platform == 'darwin' and 'Contents/MacOS' in exe_dir:
+            app_parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(exe_dir)))
+            candidate = os.path.join(app_parent_dir, "settings.json")
+            if os.path.exists(candidate):
+                return candidate
+        
+        candidate_exe = os.path.join(exe_dir, "settings.json")
+        if os.path.exists(candidate_exe):
+            return candidate_exe
+            
+        candidate_cwd = os.path.join(os.getcwd(), "settings.json")
+        if os.path.exists(candidate_cwd):
+            return candidate_cwd
+            
+        if sys.platform == 'darwin' and 'Contents/MacOS' in exe_dir:
+            app_parent_dir = os.path.dirname(os.path.dirname(os.path.dirname(exe_dir)))
+            return os.path.join(app_parent_dir, "settings.json")
+        return candidate_exe
+    else:
+        return os.path.join(os.path.dirname(os.path.abspath(__file__)), "settings.json")
 
-CONFIG_FILE = os.path.join(BASE_DIR, "settings.json")
+CONFIG_FILE = get_config_path()
 
 DEFAULT_CONFIG = {
     "parameters": {
