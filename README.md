@@ -31,12 +31,12 @@
 - **UIフレームワーク**: CustomTkinter
 - **ビルドツール**: PyInstaller
 
-### 🍎 Macユーザ向けビルド方法（.appの作成）
+### 🍎 Macユーザ向けビルド方法（単一ファイル形式）
 
-Mac環境でソースコードから `.app` 実行ファイルをビルドする場合は、以下のコマンドを実行してください：
+Mac環境でソースコードから単一の実行ファイルをビルドする場合は、以下のコマンドを実行してください：
 
 ```bash
 pip install pyinstaller customtkinter
-pyinstaller --windowed --name URLChecker main.py
+pyinstaller --onefile --windowed --name URLChecker main.py
 ```
-ビルド完了後、`dist/` フォルダ内に `URLChecker.app` が生成されます。
+ビルド完了後、`dist/` フォルダ内に単一の実行ファイルが生成されます。同じ階層に `settings.json` を配置して運用・共有できます。
