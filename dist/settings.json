@@ -1,0 +1,16 @@
+{
+    "parameters": {
+        "campaign": [
+            "summer",
+            "winter",
+            "spring",
+            "autumn",
+            "normal"
+        ],
+        "media": [
+            "Xa",
+            "YouTube",
+            "added_data"
+        ]
+    }
+}
